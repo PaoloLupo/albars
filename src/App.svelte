@@ -1,32 +1,23 @@
 <script lang="ts">
-  import Greet from './lib/Greet.svelte'
-  import { createCollapsible } from "@melt-ui/svelte";
 
-  const {
-    elements: { root, content, trigger },
-    states: { open },
-  } = createCollapsible({
-    forceVisible: true,
-  });
-
+import MenuBar from "./lib/MenuBar.svelte";
+import Footer from "./lib/Footer.svelte";
+import Greet from "./lib/Greet.svelte";
 </script>
 
-<main class="container">
+<header class="[grid-area:header] p-1">
+    <MenuBar />
+</header>
+<aside class="[grid-area:aside]">
 
-  <button
-          use:melt={$trigger}
-          class="relative h-6 w-6 place-items-center rounded-md bg-white text-sm
-        text-magnum-800 shadow hover:opacity-75 data-[disabled]:cursor-not-allowed
-        data-[disabled]:opacity-75"
-          aria-label="Toggle"
-  >
-  <div class="p-8">
+</aside>
+<main class="[grid-area:main]">
 
-  </div>
-
-  <div class="row">
-    <Greet />
-  </div>
-
-
+<Greet  />
 </main>
+
+<footer class="[grid-area:footer]">
+    <Footer />
+
+</footer>
+
