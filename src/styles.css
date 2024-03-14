@@ -1,3 +1,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+#app {
+    font-family: "Segoe UI", sans-serif;
+    display: grid;
+    grid-template-areas:
+        "header header header"
+        "aside main main"
+        "footer footer footer";
+    grid-template-columns: 200px 1fr 1fr;
+    grid-template-rows: 100px auto 30px ;
+}
+
+@layer components {
+
+    .menubar-buttons {
+        @apply inline-flex h-10 cursor-default items-center justify-center rounded-10px px-3 font-medium !ring-0 !ring-transparent data-[highlighted]:bg-lgrey-700
+    }
+
+}
