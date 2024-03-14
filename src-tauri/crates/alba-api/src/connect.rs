@@ -32,7 +32,7 @@ fn initialize_com() -> io::Result<()>{
     })
 }
 
-pub(crate) fn create_api_helper(attach: bool) -> io::Result<(ComPtr<cHelper>, ComPtr<cOAPI>)> {
+pub fn create_api_helper(attach: bool) -> io::Result<(ComPtr<cHelper>, ComPtr<cOAPI>)> {
     unsafe {
         initialize_com()?;
         let mut helper: *mut cHelper = null_mut();
@@ -73,7 +73,7 @@ pub(crate) fn create_api_helper(attach: bool) -> io::Result<(ComPtr<cHelper>, Co
     }
 }
 
-pub(crate) fn get_app_model(pointer_api: ComPtr<cOAPI>) -> io::Result<ComPtr<cSapModel>> {
+pub fn get_app_model(pointer_api: ComPtr<cOAPI>) -> io::Result<ComPtr<cSapModel>> {
     unsafe {
         let mut model: *mut cSapModel = null_mut();
         let hr =pointer_api.get_SapModel(&mut model as *mut *mut cSapModel);
