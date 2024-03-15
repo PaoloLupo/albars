@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 #app {
     font-family: "Segoe UI", sans-serif;
@@ -11,6 +9,74 @@
         "footer footer footer";
     grid-template-columns: 200px 1fr 1fr;
     grid-template-rows: 100px auto 30px ;
+}
+
+@theme {
+    --color-*: initial;
+    --color-blue-100: #E4F2FE;
+    --color-blue-200: #BEDFFE;
+    --color-blue-300: #95CCFF;
+    --color-blue-400: #6CB7FD;
+    --color-blue-500: #50A7FD;
+    --color-blue-600: #3B99FC;
+    --color-blue-700: #167EEF;
+    --color-blue-800: #0F66DE;/* //principal*/
+    --color-blue-900: #0E57CA;
+    --color-blue-950: #0C45A5;
+    --color-lgrey-100: #FFFFFF;
+    --color-lgrey-200: #FAFAFB;
+    --color-lgrey-300: #F5F5F5; /*//principal navbar*/
+    --color-lgrey-400: #EEEEEE;
+    --color-lgrey-500: #E8E8E8;
+    --color-lgrey-600: #DADADB;
+    --color-lgrey-700: #CCCDCE;
+    --color-lgrey-800: #BEBFC0;
+    --color-lgrey-900: #B0B2B3;
+    --color-lgrey-950: #A2A4A6;
+    --color-dgrey-100: #949699;
+    --color-dgrey-200: #86898C;
+    --color-dgrey-300: #787B7F;
+    --color-dgrey-400: #6A6D71;
+    --color-dgrey-500: #5C6064;
+    --color-dgrey-600: #343638;
+    --color-dgrey-700: #2D2F31;
+    --color-dgrey-800: #27282A;
+    --color-dgrey-900: #222425;
+    --color-dgrey-950: #1D1F20;
+    --color-slate-100: #F6F8FE;
+    --color-slate-200: #EFF2FE;
+    --color-slate-300: #E6E9FC;
+    --color-slate-400: #D6D9EC;
+    --color-slate-500: #B3B6C8;
+    --color-slate-600: #9496A8;
+    --color-slate-700: #6B6E7F;
+    --color-slate-800: #585A6C;
+    --color-slate-900: #393C4B;
+    --color-slate-950: #191B29;
+    --color-red-100: #FFEBEE;
+    --color-red-200: #FFCDD2;
+    --color-red-300: #EF9A9A;
+    --color-red-400: #E57373;
+    --color-red-500: #EF5350;
+    --color-red-600: #F44336; /*//principal*/
+    --color-red-700: #E53935;
+    --color-red-800: #D32F2F;
+    --color-red-900: #C62828;
+    --color-red-950: #B71C1C;
+    --color-orange-100: #FFEFE0;
+    --color-orange-200: #FFD4B2;
+    --color-orange-300: #FFBB80;
+    --color-orange-400: #FFA44D;
+    --color-orange-500: #FF9326;
+    --color-orange-600: #FF8500;
+    --color-orange-700: #FB7B00;
+    --color-orange-800: #F56A00;
+    --color-orange-900: #EF5300;
+    --color-orange-950: #E64600;
+
+    --radius-5px: 5px;
+    --radius-10px: 10px;
+    --radius-20px: 20px;
 }
 
 @layer components {
