@@ -1,14 +1,16 @@
-use std::ptr::null_mut;
 use winapi::um::winnt::HRESULT;
 use crate::bindings::{
     cSapModel,
     eUnits,
-    cPropMaterial,
+    eMatType,
 };
-use winapi::shared::winerror::S_OK;
+use winapi::shared::winerror::{S_FALSE, S_OK};
 use winapi::Interface;
 use crate::helpers::ComPtr;
 use paste::paste;
+use winapi::shared::wtypes::VARTYPE;
+use winapi::um::oaidl::SAFEARRAY;
+use winapi::um::oleauto::SafeArrayAccessData;
 
 fn hresult_to_comptr<T: Interface >(hr: HRESULT, ptr: *mut T) -> Option<ComPtr<T>> {
     match hr {
@@ -23,26 +25,44 @@ fn result_to_option(res: i32) -> Option<()> {
         _ => None,
     }
 }
+
+unsafe fn safe_array_to_slice<T>(safe_array: *mut SAFEARRAY) -> Option<Vec<T>> {
+    let mut var_type: VARTYPE = 0;
+    let hr = SafeArrayAccessData()
+
+}
 macro_rules! create_prop_binding {
-    ($name:expr) => {
+    ($($name:expr),*) => {
         paste! {
-            let mut [<$name:snake>] : *mut [<c $name>] = std::ptr::null_mut();
-            let hr: HRESULT = unsafe {self.sap_model.[<get_$name>](&mut [<$name:snake>] as *mut *mut [<c$name>])}
-            self.[<$name:snake>] = hresult_to_comptr(hr, [<$name:snake>] ).unwrap()
+        pub struct Model {
+            pub sap_model: ComPtr<cSapModel>,
+            pub units: i32,
+            $(
+            pub [<$name:snake>] : Option<ComPtr<crate::bindings::[<c $name>]>>,
+            )*
         }
-    };
-}
-pub struct Model {
-    pub sap_model: Option<ComPtr<cSapModel>>,
-    pub units: i32,
-    prop_material: Option<ComPtr<cPropMaterial>>,
-}
+        impl Model {
+            fn new(&mut self, sap_model: ComPtr<cSapModel>, units: i32) -> Self {
+            $(
+                let mut [<$name:snake>] : *mut crate::bindings::[<c $name>] = std::ptr::null_mut();
+                let hr: HRESULT = unsafe {self.sap_model.[<get_$name>](&mut [<$name:snake>] as *mut *mut crate::bindings::[<c$name>])};
+            )*
+                Self {
+                    sap_model: sap_model,
+                    units: units,
+                    $(
+                    [<$name:snake>] : hresult_to_comptr(hr, [<$name:snake>] ),
+                    )*
+                }
+            }
+            }
+        }
+        }
+    }
+
+create_prop_binding!("PropMaterial", "AreaElm");
 
 impl Model {
-    fn new(&mut self)-> self {
-
-        create_prop_binding!("PropMaterial");
-    }
 
     /// Cambio de unidades enviadas al API
     ///
@@ -96,13 +116,29 @@ impl Model {
     }
 
 
-    pub fn get_material_name_list(&self) -> Option<Vec<String>> {
-        self.prop_material.GetNameList()
-
-
+    pub fn get_material_name_list(&self, material_type: u32) -> Option<Vec<String>> {
+        let mut count_materials: i32 = 0;
+        let mut list_materials: Vec<String> = vec![];
+        let material_type = material_type as eMatType;
+        let mut ret_val: i32 = 0;
+        let array : SAFEARRAY = std::ptr::null_mut();
+        unsafe {self.prop_material.unwrap().GetNameList(/* *mut i32 */, /* *mut SAFEARRAY */, /* u32 */, /* *mut i32 */)}
+        result_to_option(ret_val);
     }
 
+}
+// create tests
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::helpers::ComPtr;
+    use crate::bindings::cSapModel;
+    use crate::instances::get_etabs_instances;
 
-
+    #[test]
+    fn test_get_etabs_instances() {
+        let instances = get_etabs_instances();
+        assert_eq!(instances.unwrap().len(), 1);
+    }
 }
