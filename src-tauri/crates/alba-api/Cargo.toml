@@ -6,5 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-winapi = { version = "0.3.9", features = ["combaseapi", "wtypesbase", "unknwnbase", "oleauto", "impl-default", "wtypes", "oaidl"] }
+paste = "1.0.14"
+winapi = { version = "0.3.9", features = ["combaseapi", "wtypesbase", "unknwnbase", "oleauto", "impl-default", "wtypes", "oaidl", "winerror", "objbase"] }
 winreg = "0.52.0"
