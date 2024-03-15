@@ -1,16 +1,19 @@
-use winapi::um::winnt::HRESULT;
+use crate::helpers::{bstr, ComPtr};
 use crate::bindings::{
-    cSapModel,
-    eUnits,
-    eMatType,
+    cCaseStaticNonlinear, cSapModel, eMatType, eUnits
 };
-use winapi::shared::winerror::{S_FALSE, S_OK};
-use winapi::Interface;
-use crate::helpers::ComPtr;
 use paste::paste;
-use winapi::shared::wtypes::VARTYPE;
+use std::vec::IntoIter;
+use winapi::Interface;
+use winapi::shared::winerror::S_OK;
+use winapi::shared::wtypes::{BSTR, VARTYPE, VT_BSTR, VT_BYREF};
 use winapi::um::oaidl::SAFEARRAY;
-use winapi::um::oleauto::SafeArrayAccessData;
+use winapi::um::winnt::{FILE_LIST_DIRECTORY, HRESULT, LONG, PVOID};
+use winapi::um::oleauto::{SafeArrayCreateVector};
+
+use winapi::ctypes::c_void;
+use crate::safearray::SafeArray;
+
 
 fn hresult_to_comptr<T: Interface >(hr: HRESULT, ptr: *mut T) -> Option<ComPtr<T>> {
     match hr {
@@ -26,11 +29,33 @@ fn result_to_option(res: i32) -> Option<()> {
     }
 }
 
-unsafe fn safe_array_to_slice<T>(safe_array: *mut SAFEARRAY) -> Option<Vec<T>> {
-    let mut var_type: VARTYPE = 0;
-    let hr = SafeArrayAccessData()
+// unsafe fn safe_array_to_vec<T: SafeArrayElement>(safe_array: *mut SAFEARRAY) -> Option<Vec<T::Element>> {
+//     let mut vec: Vec<T::Element> = vec![];
+//     let mut lower_bound: i32 = 0;
+//     let mut upper_bound: i32 = 0;
+//     let mut hr: HRESULT = 0;
+//     let mut data: *mut T::Element = std::ptr::null_mut();
+//     hr = SafeArrayGetLBound(safe_array, 1, &mut lower_bound);
+//     if hr != 0 {
+//         return None;
+//     }
+//     hr = SafeArrayGetUBound(safe_array, 1, &mut upper_bound);
+//     if hr != 0 {
+//         return None;
+//     }
+//     let data_ptr: *mut *mut c_void = &mut data as *mut *mut T::Element as *mut *mut c_void;
+//     hr = SafeArrayAccessData(safe_array, data_ptr);
+//     if hr != 0 {
+//         return None;
+//     }
+//     for i in lower_bound..=upper_bound {
+//         vec.push(*data.offset(i as isize));
+//     }
+//     SafeArrayUnaccessData(safe_array);
+//     Some(vec)
 
-}
+// }
+
 macro_rules! create_prop_binding {
     ($($name:expr),*) => {
         paste! {
@@ -38,27 +63,30 @@ macro_rules! create_prop_binding {
             pub sap_model: ComPtr<cSapModel>,
             pub units: i32,
             $(
-            pub [<$name:snake>] : Option<ComPtr<crate::bindings::[<c $name>]>>,
+            pub [<$name:snake>] : ComPtr<crate::bindings::[<c $name>]>,
             )*
         }
         impl Model {
-            fn new(&mut self, sap_model: ComPtr<cSapModel>, units: i32) -> Self {
-            $(
-                let mut [<$name:snake>] : *mut crate::bindings::[<c $name>] = std::ptr::null_mut();
-                let hr: HRESULT = unsafe {self.sap_model.[<get_$name>](&mut [<$name:snake>] as *mut *mut crate::bindings::[<c$name>])};
-            )*
+            pub fn new(sap_model: ComPtr<cSapModel>, units: i32) -> Self {
                 Self {
-                    sap_model: sap_model,
+                    sap_model,
                     units: units,
                     $(
-                    [<$name:snake>] : hresult_to_comptr(hr, [<$name:snake>] ),
+                    [<$name:snake>] : None,
                     )*
                 }
             }
+            pub fn get_interface(&mut self) {
+            $(
+                let mut [<$name:snake>] : *mut crate::bindings::[<c $name>] = std::ptr::null_mut();
+                let hr: HRESULT = unsafe {self.sap_model.[<get_$name>](&mut [<$name:snake>] as *mut *mut crate::bindings::[<c$name>])};
+                self.[<$name:snake>] = hresult_to_comptr(hr, [<$name:snake>]);
+            )*
             }
         }
         }
     }
+}
 
 create_prop_binding!("PropMaterial", "AreaElm");
 
@@ -115,30 +143,70 @@ impl Model {
         result_to_option(ret_val)
     }
 
+    pub fn get_material_name_list(self, material_type: u32) -> Option<Vec<String>> {
+        unsafe {
+            let mut count_materials: i32 = 0;
 
-    pub fn get_material_name_list(&self, material_type: u32) -> Option<Vec<String>> {
+            let material_type = material_type as eMatType;
+            let mut ret_val: i32 = 0;
+            let mut safe_array = SafeArray::new( VT_BSTR as u16, 0,1).unwrap();
+            let safe_array_ref: *mut SAFEARRAY = safe_array.psa;
+                
+            if safe_array_ref.is_null() {
+                return None;
+            }
+    
+            if let Some(prop_material) = self.prop_material {
+                prop_material.GetNameList(&mut count_materials, safe_array_ref, material_type , &mut ret_val);
+            } else {
+                return None;
+            }
+    
+            if ret_val != 0 {
+                return None
+            }
+    
+            Some(safe_array.to_string_vector().unwrap())
+
+        }
+    }
+
+    pub fn add_isotropic_material(self, name: &str, mod_elasticity: f64, poisson_ratio: f64, thermal_coeff: f64) -> Option<()> {
+        let mut ret_val: i32 = 0;
+
+        unsafe {
+            let name = bstr(name);
+            self.prop_material.unwrap().SetMPIsotropic(name, mod_elasticity, poisson_ratio, thermal_coeff, 0.0, &mut ret_val);
+        }
+        
+        result_to_option(ret_val)
+    }
+
+    pub fn count_materials_from_type(self, material_type: u32) -> Option<i32> {
         let mut count_materials: i32 = 0;
-        let mut list_materials: Vec<String> = vec![];
         let material_type = material_type as eMatType;
         let mut ret_val: i32 = 0;
-        let array : SAFEARRAY = std::ptr::null_mut();
-        unsafe {self.prop_material.unwrap().GetNameList(/* *mut i32 */, /* *mut SAFEARRAY */, /* u32 */, /* *mut i32 */)}
-        result_to_option(ret_val);
+        unsafe {self.prop_material.unwrap().Count(material_type, &mut ret_val)};
+
+        if ret_val != 0 {
+            return None
+        }
+        Some(count_materials)
     }
 
-}
-// create tests
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::helpers::ComPtr;
-    use crate::bindings::cSapModel;
-    use crate::instances::get_etabs_instances;
+    // pub fn get_material_name_list(&self, material_type: u32) -> Option<Vec<String>> {
+    //     let mut count_materials: i32 = 0;
+    //     let mut safe_array: *mut SAFEARRAY = std::ptr::null_mut();
+    //     let mut list_materials: Vec<String> = vec![];
+    //     let material_type = material_type as eMatType;
+    //     let mut ret_val: i32 = 0;
 
-    #[test]
-    fn test_get_etabs_instances() {
-        let instances = get_etabs_instances();
-        assert_eq!(instances.unwrap().len(), 1);
-    }
+    //     unsafe {self.prop_material.unwrap().GetNameList(&mut count_materials, safe_array, material_type, &mut ret_val);}
+    //     if ret_val != 0 {
+    //         return None
+    //     }
+
+    // }
+
 }
