@@ -17,11 +17,11 @@
 </script>
 
 <button
-    class=" button-primary
+    class=" 
     {loading ? loadingclass : ""}
     {failed ? failedclass : ""}
     {success ? successclass : ""}
-    {loading || failed || success ? "px-4 pr-8 pl-4" : "bg-blue-800 hover:bg-blue-600 px-3"}
+    {loading || failed || success ? "px-4 pr-8 pl-4" : "button-primary"}
     "
    on:click|preventDefault
 >
