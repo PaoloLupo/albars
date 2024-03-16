@@ -1,6 +1,6 @@
 mod bindings;
 mod helpers;
-mod connect;
+pub mod connect;
 pub mod instances;
 mod api;
 mod safearray;

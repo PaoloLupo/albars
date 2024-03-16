@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use alba_api::connect::create_api_helper;
 use alba_api::get_app_model;
+use alba_api::get_etabs_instances;
 
 
 #[tauri::command]

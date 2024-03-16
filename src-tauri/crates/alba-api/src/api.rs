@@ -9,7 +9,7 @@ use winapi::shared::winerror::S_OK;
 use winapi::shared::wtypes::{BSTR, VARTYPE, VT_BSTR, VT_BYREF};
 use winapi::um::oaidl::SAFEARRAY;
 use winapi::um::winnt::{FILE_LIST_DIRECTORY, HRESULT, LONG, PVOID};
-use winapi::um::oleauto::{SafeArrayCreateVector};
+use winapi::um::oleauto::{SafeArrayCreateVector, SafeArrayDestroy};
 
 use winapi::ctypes::c_void;
 use crate::safearray::SafeArray;
@@ -29,33 +29,6 @@ fn result_to_option(res: i32) -> Option<()> {
     }
 }
 
-// unsafe fn safe_array_to_vec<T: SafeArrayElement>(safe_array: *mut SAFEARRAY) -> Option<Vec<T::Element>> {
-//     let mut vec: Vec<T::Element> = vec![];
-//     let mut lower_bound: i32 = 0;
-//     let mut upper_bound: i32 = 0;
-//     let mut hr: HRESULT = 0;
-//     let mut data: *mut T::Element = std::ptr::null_mut();
-//     hr = SafeArrayGetLBound(safe_array, 1, &mut lower_bound);
-//     if hr != 0 {
-//         return None;
-//     }
-//     hr = SafeArrayGetUBound(safe_array, 1, &mut upper_bound);
-//     if hr != 0 {
-//         return None;
-//     }
-//     let data_ptr: *mut *mut c_void = &mut data as *mut *mut T::Element as *mut *mut c_void;
-//     hr = SafeArrayAccessData(safe_array, data_ptr);
-//     if hr != 0 {
-//         return None;
-//     }
-//     for i in lower_bound..=upper_bound {
-//         vec.push(*data.offset(i as isize));
-//     }
-//     SafeArrayUnaccessData(safe_array);
-//     Some(vec)
-
-// }
-
 macro_rules! create_prop_binding {
     ($($name:expr),*) => {
         paste! {
@@ -63,7 +36,7 @@ macro_rules! create_prop_binding {
             pub sap_model: ComPtr<cSapModel>,
             pub units: i32,
             $(
-            pub [<$name:snake>] : ComPtr<crate::bindings::[<c $name>]>,
+            pub [<$name:snake>] : Option<ComPtr<crate::bindings::[<c $name>]>>,
             )*
         }
         impl Model {
@@ -149,15 +122,11 @@ impl Model {
 
             let material_type = material_type as eMatType;
             let mut ret_val: i32 = 0;
-            let mut safe_array = SafeArray::new( VT_BSTR as u16, 0,1).unwrap();
-            let safe_array_ref: *mut SAFEARRAY = safe_array.psa;
+            let  safe_array: *mut SAFEARRAY = std::ptr::null_mut();
                 
-            if safe_array_ref.is_null() {
-                return None;
-            }
     
             if let Some(prop_material) = self.prop_material {
-                prop_material.GetNameList(&mut count_materials, safe_array_ref, material_type , &mut ret_val);
+                prop_material.GetNameList(&mut count_materials, safe_array, material_type, &mut ret_val);
             } else {
                 return None;
             }
@@ -165,8 +134,11 @@ impl Model {
             if ret_val != 0 {
                 return None
             }
-    
-            Some(safe_array.to_string_vector().unwrap())
+
+            let array = SafeArray { psa: safe_array };
+            SafeArrayDestroy(array.psa);
+
+            Some(array.to_string_vector().unwrap())
 
         }
     }
@@ -185,28 +157,11 @@ impl Model {
     pub fn count_materials_from_type(self, material_type: u32) -> Option<i32> {
         let mut count_materials: i32 = 0;
         let material_type = material_type as eMatType;
-        let mut ret_val: i32 = 0;
-        unsafe {self.prop_material.unwrap().Count(material_type, &mut ret_val)};
-
-        if ret_val != 0 {
+        let hr = unsafe {self.prop_material.unwrap().Count(material_type, &mut count_materials)};
+        if hr != 0 {
             return None
         }
         Some(count_materials)
     }
-
-
-    // pub fn get_material_name_list(&self, material_type: u32) -> Option<Vec<String>> {
-    //     let mut count_materials: i32 = 0;
-    //     let mut safe_array: *mut SAFEARRAY = std::ptr::null_mut();
-    //     let mut list_materials: Vec<String> = vec![];
-    //     let material_type = material_type as eMatType;
-    //     let mut ret_val: i32 = 0;
-
-    //     unsafe {self.prop_material.unwrap().GetNameList(&mut count_materials, safe_array, material_type, &mut ret_val);}
-    //     if ret_val != 0 {
-    //         return None
-    //     }
-
-    // }
 
 }
