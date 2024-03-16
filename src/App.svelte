@@ -10,7 +10,7 @@
 <aside class="[grid-area:aside]">
 
 </aside>
-<main class="[grid-area:main]">
+<main class="[grid-area:main] bg-orange-400">
     <Greet  />
 </main>
 

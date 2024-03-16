@@ -17,7 +17,7 @@
 </script>
 
 <button
-    class="flex transition-all overflow-hidden transform relative text-white rounded-5px
+    class=" button-primary
     {loading ? loadingclass : ""}
     {failed ? failedclass : ""}
     {success ? successclass : ""}

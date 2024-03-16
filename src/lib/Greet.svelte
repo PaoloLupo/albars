@@ -16,4 +16,7 @@
     <button type="submit">Greet</button>
   </form>
   <p>{greetMsg}</p>
+  <button class="button_primary h-[100px] text-white">
+Abrir
+  </button>
 </div>
