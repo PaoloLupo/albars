@@ -5,7 +5,7 @@ use std::cell::Cell;
 use std::io;
 use std::ptr::null_mut;
 use winapi::Interface;
-use winapi::um::combaseapi::{CLSIDFromProgID, CoCreateInstance, CoInitializeEx};
+use winapi::um::combaseapi::{CLSIDFromProgID, CoCreateInstance, CoInitializeEx, CoUninitialize};
 use winapi::um::objbase::COINIT_MULTITHREADED;
 use winapi::shared::winerror::{S_FALSE, S_OK};
 use winapi::shared::guiddef::GUID;
@@ -73,7 +73,7 @@ pub fn create_api_helper(attach: bool) -> io::Result<(ComPtr<cHelper>, ComPtr<cO
     }
 }
 
-pub fn get_app_model(pointer_api: ComPtr<cOAPI>) -> io::Result<ComPtr<cSapModel>> {
+pub fn get_app_model(pointer_api: &ComPtr<cOAPI>) -> io::Result<ComPtr<cSapModel>> {
     unsafe {
         let mut model: *mut cSapModel = null_mut();
         let hr =pointer_api.get_SapModel(&mut model as *mut *mut cSapModel);
@@ -82,6 +82,14 @@ pub fn get_app_model(pointer_api: ComPtr<cOAPI>) -> io::Result<ComPtr<cSapModel>
             err => custom_error("Failed to get ETABS model", err)
         }
     }
+}
+
+pub fn counitializate() {
+    unsafe {
+        CoUninitialize();
+    
+    }
+
 }
 
 

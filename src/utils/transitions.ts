@@ -7,7 +7,7 @@ type FlyAndScaleParams = {
     duration?: number;
 };
 
-const defaultFlyAndScaleParams= {y:-8, start: 0.95, duration: 200};
+const defaultFlyAndScaleParams= {y:-8, start: 0.95, duration: 100};
 
 export const flyAndScale = (node: Element, params?: FlyAndScaleParams): TransitionConfig => {
     const style = getComputedStyle(node);
