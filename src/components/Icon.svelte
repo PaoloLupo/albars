@@ -8,7 +8,7 @@
 
 	export let color = 'white'
 	export let stroke = color
-    export let strokewidth = '2'
+    export let strokewidth = '1.5'
 	export let fill = 'none'
 
 	$: elements = data

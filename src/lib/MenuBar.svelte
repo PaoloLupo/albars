@@ -1,28 +1,37 @@
 <script lang="ts">
     import { Menubar } from "bits-ui";
 	import {flyAndScale} from "../utils/transitions";
+	import Icon from "../components/Icon.svelte";
+	import list from "$icons/list.svg?raw";
+	import ParametrosIniciales from "./ParametrosIniciales.svelte";
+	import CanvasDensidad from "./CanvasDensidad.svelte";
+
+	let { selectedIndexComponent } = $props();
+
+	let indexSelected = $state(0);
+
+
+	$effect(() => {
+        selectedIndexComponent = indexSelected;
+		console.log(selectedIndexComponent)
+    });
+
+
 </script>
 
-<Menubar.Root class="flex h-12 items-center gap-1 bg-lgrey-400 rounded">
-    <div class="px-2.5 font-bold text-2xl">
-      Alba
-
+    <div class="flex flex-row h-full bg-lgrey-300">
+        <div class="basis-1/3">
+        </div>
+        <div class="flex basis-1/3 place-items-center justify-center">
+            <button class="button_menubar" onclick={()=> indexSelected = 0}>
+                <Icon data="{list}" stroke="black" size="30px" />
+                Parámetros
+            </button>
+            <button class="button_menubar" onclick={()=> indexSelected = 1}>
+                <Icon data="{list}" stroke="black" size="30px" />
+                Parámetros
+            </button>
+        </div>
+        <div class="basis-1/3">
+        </div>
     </div>
-    <Menubar.Menu>
-        <Menubar.Trigger class="menubar-buttons">
-            View
-            <Menubar.Content
-                    class="z-50 w-full max-w-[220px] rounded-10px border border-lgrey-900 bg-lgrey-400 "
-                    transition={flyAndScale}
-                    align="start"
-                    sideOffset={10}
-            >
-                asda
-            </Menubar.Content>
-
-        </Menubar.Trigger>
-
-    </Menubar.Menu>
-
-
-</Menubar.Root>

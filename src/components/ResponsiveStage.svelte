@@ -42,7 +42,7 @@
 
 </script>
 
-<div bind:this={container} style="width: 100%; ">
+<div bind:this={container} class="h-full w-full">
     <Stage 
         {config}
         style="border: 1px solid black;"

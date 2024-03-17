@@ -11,7 +11,7 @@
 	let isConnectionSuccess: boolean = $state(false);
 </script>
 
-<div class="flex h-full items-center gap-2 px-3 bg-lgrey-400">
+<div class="flex h-full items-center gap-2 px-3 bg-lgrey-300">
     <ConfigMenuPopover/>
 
 
