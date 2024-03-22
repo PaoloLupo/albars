@@ -1,4 +1,4 @@
-workspace = { members = ["crates/alba-api"] }
+workspace = { members = ["crates/alba_ffi", "crates/alba_solver"] }
 [package]
 name = "alba"
 version = "0.0.0"
@@ -15,7 +15,8 @@ tauri-build = { version = "1", features = [] }
 tauri = { version = "1", features = ["shell-open"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-alba-api = { path = "crates/alba-api" }
+alba_ffi = { path = "crates/alba_ffi" }
+thiserror = "1.0.58"
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

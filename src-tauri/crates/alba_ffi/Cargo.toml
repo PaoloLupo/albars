@@ -1,0 +1,16 @@
+[package]
+name = "alba_ffi"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+paste = "1.0.14"
+winreg = "0.52.0"
+thiserror = "1.0.58"
+cxx = "1.0.119"
+
+[build-dependencies]
+cxx-build = "1.0.119"
+
