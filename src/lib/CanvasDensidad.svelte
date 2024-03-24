@@ -9,6 +9,8 @@
     let width:number;
     let height:number;
 
+    var shadow
+
 
 </script>
 

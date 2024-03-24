@@ -4,8 +4,6 @@ pub mod api;
 
 pub use crate::instances::get_etabs_instances;
 
-
-
 #[cfg(test)]
 mod tests {
     use super::*;

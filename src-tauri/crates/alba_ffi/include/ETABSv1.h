@@ -10959,7 +10959,7 @@ _StartService : IDispatch
 // Function implementation mapping
 //
 
-#pragma start_map_region("C:\Users\paolo\source\repos\ETABSAPI\ETABSAPI\x64\Debug\ETABSv1.tli")
+#pragma start_map_region("C:\Users\paolo\dev\tauri\alba\src-tauri\crates\alba_ffi\include\ETABSv1.tli")
 __declspec(implementation_key(1)) long cAreaElm::Count ( );
 __declspec(implementation_key(2)) long cAreaElm::GetLoadTemperature ( _bstr_t Name, long * NumberItems, SAFEARRAY * * AreaName, SAFEARRAY * * LoadPat, SAFEARRAY * * MyType, SAFEARRAY * * Value, SAFEARRAY * * PatternName, enum eItemTypeElm ItemTypeElm );
 __declspec(implementation_key(3)) long cAreaElm::GetLoadUniform ( _bstr_t Name, long * NumberItems, SAFEARRAY * * AreaName, SAFEARRAY * * LoadPat, SAFEARRAY * * CSys, SAFEARRAY * * Dir, SAFEARRAY * * Value, enum eItemTypeElm ItemTypeElm );
